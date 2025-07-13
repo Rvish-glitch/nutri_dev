@@ -1,0 +1,42 @@
+name: nutridev
+description: "A nutrition scanning app that helps users make informed food choices."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.2.1
+  haptic_feedback: ^0.4.2
+  fluttertoast: ^8.2.4
+  flutter_launcher_icons: ^0.13.1
+  get:
+  mobile_scanner: ^7.0.1
+  http: ^1.1.0
+  shared_preferences: ^2.2.2
+  firebase_core: ^2.27.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/nd1.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - lib/asset/images/scan.png
+    - lib/asset/images/history.png
+    - lib/asset/images/alternatives.png
+    - lib/asset/images/avoid.png
+    - assets/icons/nd1.png

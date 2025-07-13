@@ -1,0 +1,334 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:nutridev/screens/nutrition_details.dart';
+import 'package:nutridev/services/scan_history_service.dart';
+import 'package:nutridev/widgets/nutrition_summary_widget.dart';
+
+class HistoryPage extends StatelessWidget {
+  const HistoryPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scanHistoryService = Get.find<ScanHistoryService>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Scan History', style: GoogleFonts.lexend()),
+        backgroundColor: const Color(0xfff4f2f2),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_sweep),
+            onPressed: () {
+              Get.dialog(
+                AlertDialog(
+                  title: const Text('Clear History'),
+                  content: const Text(
+                      'Are you sure you want to clear all scan history?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        scanHistoryService.clearHistory();
+                        Get.back();
+                      },
+                      child: const Text('Clear',
+                          style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Obx(() {
+        final history = scanHistoryService.getHistory();
+
+        if (history.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.history,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'No scan history yet',
+                  style: GoogleFonts.lexend(
+                    fontSize: 18,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Scan some products to see them here',
+                  style: GoogleFonts.lexend(
+                    fontSize: 14,
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            // Nutrition Summary Widget
+            SizedBox(
+              height: 400,
+              child: const NutritionSummaryWidget(),
+            ),
+
+            // Divider
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: Divider(color: Colors.grey[300]),
+            ),
+
+            // History List
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: history.length,
+                itemBuilder: (context, index) {
+                  final item = history[index];
+                  final barcode = item['barcode'] ?? '';
+                  final name = item['name'] ?? 'Unknown Product';
+                  final scannedAt = item['scannedAt'] ?? '';
+                  final scanTime = scanHistoryService.formatScanTime(scannedAt);
+                  final isManual = item['manual'] == true;
+                  final quantity = item['quantity']?.toString() ?? '';
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      leading: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color:
+                              isManual ? Colors.green[100] : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          isManual ? Icons.restaurant : Icons.qr_code_scanner,
+                          color: isManual ? Colors.green : Colors.grey,
+                        ),
+                      ),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              name,
+                              style: GoogleFonts.lexend(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          if (isManual)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.green[100],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'Manual',
+                                style: GoogleFonts.lexend(
+                                  fontSize: 10,
+                                  color: Colors.green[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          if (isManual) ...[
+                            Text(
+                              'Quantity: $quantity',
+                              style: GoogleFonts.lexend(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                          ] else ...[
+                            Text(
+                              'Barcode: $barcode',
+                              style: GoogleFonts.lexend(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                          ],
+                          Text(
+                            scanTime,
+                            style: GoogleFonts.lexend(
+                              fontSize: 12,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: PopupMenuButton<String>(
+                        onSelected: (value) {
+                          if (value == 'view') {
+                            if (isManual) {
+                              // Show manual food details in a dialog
+                              _showManualFoodDetails(item);
+                            } else if (barcode.isNotEmpty) {
+                              Get.to(
+                                  () => NutritionDetailsPage(barcode: barcode));
+                            }
+                          } else if (value == 'remove') {
+                            if (isManual) {
+                              // Remove manual entry by name and timestamp
+                              final removeKey =
+                                  '${item['name']}_${item['scannedAt']}';
+                              scanHistoryService.removeFromHistory(removeKey);
+                            } else {
+                              scanHistoryService.removeFromHistory(barcode);
+                            }
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'view',
+                            child: Row(
+                              children: [
+                                Icon(Icons.visibility, size: 18),
+                                SizedBox(width: 8),
+                                Text(
+                                    isManual ? 'View Details' : 'View Details'),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'remove',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, size: 18, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text('Remove',
+                                    style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  void _showManualFoodDetails(Map<String, dynamic> item) {
+    final nutrition = item['nutrition'] as Map<String, dynamic>?;
+    final quantity = item['quantity']?.toString() ?? '';
+    final scanHistoryService = Get.find<ScanHistoryService>();
+    final scanTime = scanHistoryService.formatScanTime(item['scannedAt'] ?? '');
+
+    Get.dialog(
+      AlertDialog(
+        title: Text(
+          '${item['name']} Details',
+          style: GoogleFonts.lexend(fontWeight: FontWeight.w600),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Quantity: $quantity',
+                style: GoogleFonts.lexend(
+                    fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Added: $scanTime',
+                style:
+                    GoogleFonts.lexend(fontSize: 14, color: Colors.grey[600]),
+              ),
+              if (nutrition != null) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Nutrition Information:',
+                  style: GoogleFonts.lexend(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                _buildNutritionRow('Calories',
+                    '${nutrition['calories']?.toStringAsFixed(1) ?? '0'} kcal'),
+                _buildNutritionRow('Protein',
+                    '${nutrition['protein']?.toStringAsFixed(1) ?? '0'}g'),
+                _buildNutritionRow('Carbs',
+                    '${nutrition['carbs']?.toStringAsFixed(1) ?? '0'}g'),
+                _buildNutritionRow(
+                    'Fat', '${nutrition['fat']?.toStringAsFixed(1) ?? '0'}g'),
+                _buildNutritionRow('Fiber',
+                    '${nutrition['fiber']?.toStringAsFixed(1) ?? '0'}g'),
+                _buildNutritionRow('Sugar',
+                    '${nutrition['sugar']?.toStringAsFixed(1) ?? '0'}g'),
+                _buildNutritionRow(
+                    'Salt', '${nutrition['salt']?.toStringAsFixed(1) ?? '0'}g'),
+                _buildNutritionRow('Sodium',
+                    '${nutrition['sodium']?.toStringAsFixed(1) ?? '0'}mg'),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Close',
+              style: GoogleFonts.lexend(fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNutritionRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.lexend(fontSize: 14, color: Colors.grey[700]),
+          ),
+          Text(
+            value,
+            style:
+                GoogleFonts.lexend(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+}
