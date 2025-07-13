@@ -5,7 +5,7 @@
   
   <br>
   
-  <img src="assets/icons/r2dm.jpg" alt="R2DM" width="300"/>
+  <img src="assets/icons/r2dm.jpg" alt="R2DM" width="300" style="margin-right: 20px;"/>
   <img src="assets/icons/rdm.jpg" alt="RDM" width="300"/>
 </div>
 
