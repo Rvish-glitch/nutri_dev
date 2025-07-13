@@ -3,6 +3,7 @@ import 'package:nutridev/screens/lander.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nutridev/services/scan_history_service.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 void main() {
   // Initialize services
@@ -18,6 +19,15 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'NutriDev',
+      builder: (context, child) => ResponsiveBreakpoints.builder(
+        child: child!,
+        breakpoints: [
+          const Breakpoint(start: 0, end: 480, name: MOBILE),
+          const Breakpoint(start: 481, end: 800, name: TABLET),
+          const Breakpoint(start: 801, end: 1000, name: DESKTOP),
+          const Breakpoint(start: 1001, end: double.infinity, name: '4K'),
+        ],
+      ),
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

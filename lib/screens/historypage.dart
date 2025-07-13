@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nutridev/screens/nutrition_details.dart';
 import 'package:nutridev/services/scan_history_service.dart';
 import 'package:nutridev/widgets/nutrition_summary_widget.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -12,6 +13,35 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final scanHistoryService = Get.find<ScanHistoryService>();
     final theme = Theme.of(context);
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final isTablet = ResponsiveBreakpoints.of(context).isTablet;
+
+    // Responsive dimensions
+    final horizontalPadding = isMobile
+        ? 12.0
+        : isTablet
+            ? 16.0
+            : 20.0;
+    final iconSize = isMobile
+        ? 48.0
+        : isTablet
+            ? 56.0
+            : 64.0;
+    final fontSize = isMobile
+        ? 14.0
+        : isTablet
+            ? 16.0
+            : 18.0;
+    final smallFontSize = isMobile
+        ? 10.0
+        : isTablet
+            ? 12.0
+            : 14.0;
+    final summaryHeight = isMobile
+        ? 300.0
+        : isTablet
+            ? 350.0
+            : 400.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -60,14 +90,14 @@ class HistoryPage extends StatelessWidget {
               children: [
                 Icon(
                   Icons.history,
-                  size: 64,
+                  size: iconSize,
                   color: theme.colorScheme.onSurface.withOpacity(0.4),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'No scan history yet',
                   style: GoogleFonts.lexend(
-                    fontSize: 18,
+                    fontSize: fontSize + 2,
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
@@ -75,7 +105,7 @@ class HistoryPage extends StatelessWidget {
                 Text(
                   'Scan some products to see them here',
                   style: GoogleFonts.lexend(
-                    fontSize: 14,
+                    fontSize: fontSize - 2,
                     color: theme.colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
@@ -88,13 +118,13 @@ class HistoryPage extends StatelessWidget {
           children: [
             // Nutrition Summary Widget
             SizedBox(
-              height: 400,
+              height: summaryHeight,
               child: const NutritionSummaryWidget(),
             ),
 
             // Divider
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
+              margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
               child:
                   Divider(color: theme.colorScheme.onSurface.withOpacity(0.2)),
             ),
@@ -102,7 +132,7 @@ class HistoryPage extends StatelessWidget {
             // History List
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(horizontalPadding),
                 itemCount: history.length,
                 itemBuilder: (context, index) {
                   final item = history[index];
@@ -114,12 +144,12 @@ class HistoryPage extends StatelessWidget {
                   final quantity = item['quantity']?.toString() ?? '';
 
                   return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: horizontalPadding - 4),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.all(16),
+                      contentPadding: EdgeInsets.all(horizontalPadding),
                       leading: Container(
-                        width: 50,
-                        height: 50,
+                        width: iconSize - 16,
+                        height: iconSize - 16,
                         decoration: BoxDecoration(
                           color: isManual
                               ? theme.colorScheme.secondary.withOpacity(0.2)
@@ -139,7 +169,7 @@ class HistoryPage extends StatelessWidget {
                             child: Text(
                               name,
                               style: GoogleFonts.lexend(
-                                fontSize: 16,
+                                fontSize: fontSize,
                                 fontWeight: FontWeight.w500,
                                 color: theme.colorScheme.onSurface,
                               ),
@@ -157,7 +187,7 @@ class HistoryPage extends StatelessWidget {
                               child: Text(
                                 'Manual',
                                 style: GoogleFonts.lexend(
-                                  fontSize: 10,
+                                  fontSize: smallFontSize,
                                   color: theme.colorScheme.secondary,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -173,7 +203,7 @@ class HistoryPage extends StatelessWidget {
                             Text(
                               'Quantity: $quantity',
                               style: GoogleFonts.lexend(
-                                fontSize: 12,
+                                fontSize: smallFontSize,
                                 color: theme.colorScheme.onSurface
                                     .withOpacity(0.7),
                               ),
@@ -183,7 +213,7 @@ class HistoryPage extends StatelessWidget {
                             Text(
                               'Barcode: $barcode',
                               style: GoogleFonts.lexend(
-                                fontSize: 12,
+                                fontSize: smallFontSize,
                                 color: theme.colorScheme.onSurface
                                     .withOpacity(0.7),
                               ),
@@ -193,7 +223,7 @@ class HistoryPage extends StatelessWidget {
                           Text(
                             scanTime,
                             style: GoogleFonts.lexend(
-                              fontSize: 12,
+                              fontSize: smallFontSize,
                               color:
                                   theme.colorScheme.onSurface.withOpacity(0.6),
                             ),

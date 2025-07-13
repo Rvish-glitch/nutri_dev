@@ -3,12 +3,33 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:nutridev/screens/account_preferencespage.dart';
 import 'package:nutridev/screens/settings_page.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class Profile extends StatelessWidget {
   Profile({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final isTablet = ResponsiveBreakpoints.of(context).isTablet;
+
+    // Responsive dimensions
+    final horizontalPadding = isMobile
+        ? 12.0
+        : isTablet
+            ? 16.0
+            : 20.0;
+    final fontSize = isMobile
+        ? 14.0
+        : isTablet
+            ? 16.0
+            : 18.0;
+    final titleFontSize = isMobile
+        ? 20.0
+        : isTablet
+            ? 24.0
+            : 28.0;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile', style: GoogleFonts.lexend()),
@@ -20,18 +41,18 @@ class Profile extends StatelessWidget {
           children: [
             // User info section
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(horizontalPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Guest User',
                     style: GoogleFonts.lexend(
-                        fontSize: 24.0, fontWeight: FontWeight.bold),
+                        fontSize: titleFontSize, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     'Using app without account',
-                    style: GoogleFonts.lexend(fontSize: 16),
+                    style: GoogleFonts.lexend(fontSize: fontSize),
                   ),
                   const SizedBox(height: 8.0),
                   const Divider(thickness: 2.0),
@@ -41,8 +62,8 @@ class Profile extends StatelessWidget {
             ),
             // Account preferences section
             ListTile(
-              title:
-                  Text('My Account Preferences', style: GoogleFonts.lexend()),
+              title: Text('My Account Preferences',
+                  style: GoogleFonts.lexend(fontSize: fontSize)),
               onTap: () {
                 Get.to(() => AccountPreferencesPage());
               },
@@ -50,7 +71,8 @@ class Profile extends StatelessWidget {
             const Divider(),
             // Settings section
             ListTile(
-              title: Text('Settings', style: GoogleFonts.lexend()),
+              title: Text('Settings',
+                  style: GoogleFonts.lexend(fontSize: fontSize)),
               onTap: () {
                 Get.to(() => SettingsPage());
               },

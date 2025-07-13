@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:nutridev/services/scan_history_service.dart';
 import 'package:nutridev/widgets/add_food_dialog.dart';
 import 'package:nutridev/widgets/nutrition_calculator_widget.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class LanderClass extends StatefulWidget {
   const LanderClass({super.key});
@@ -101,30 +102,46 @@ class _LanderClassState extends State<LanderClass> {
                 ),
                 // Classic Scanning Overlay
                 Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 250,
-                        height: 150,
+                  child: Builder(
+                    builder: (context) {
+                      final screenWidth = MediaQuery.of(context).size.width;
+                      final screenHeight = MediaQuery.of(context).size.height;
+                      final isMobile =
+                          ResponsiveBreakpoints.of(context).isMobile;
+                      final isTablet =
+                          ResponsiveBreakpoints.of(context).isTablet;
+                      final fontSize = isMobile
+                          ? 14.0
+                          : isTablet
+                              ? 16.0
+                              : 18.0;
+
+                      return Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.black.withOpacity(0.3),
                         ),
-                        child: const Center(
-                          child: Text(
-                            'Position barcode here',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                        child: Center(
+                          child: Container(
+                            width: screenWidth * 0.7,
+                            height: screenHeight * 0.2,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white, width: 2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Position barcode here',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: fontSize,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -226,14 +243,59 @@ class _LanderClassState extends State<LanderClass> {
 
   Widget buildHomePage() {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final isTablet = ResponsiveBreakpoints.of(context).isTablet;
+
+    // Responsive dimensions
+    final horizontalPadding = isMobile
+        ? 16.0
+        : isTablet
+            ? 24.0
+            : 32.0;
+    final topMargin = isMobile
+        ? 40.0
+        : isTablet
+            ? 50.0
+            : 60.0;
+    final cardHeight = isMobile
+        ? 140.0
+        : isTablet
+            ? 160.0
+            : 180.0;
+    final cardWidth = isMobile
+        ? 120.0
+        : isTablet
+            ? 140.0
+            : 160.0;
+    final iconSize = isMobile
+        ? 28.0
+        : isTablet
+            ? 32.0
+            : 36.0;
+    final fontSize = isMobile
+        ? 14.0
+        : isTablet
+            ? 16.0
+            : 18.0;
+    final headerFontSize = isMobile
+        ? 20.0
+        : isTablet
+            ? 24.0
+            : 28.0;
+
     return SingleChildScrollView(
       child: Column(
         children: [
           // Premium Header Section
           Container(
-            margin:
-                const EdgeInsets.only(top: 60, left: 24, right: 24, bottom: 32),
-            padding: const EdgeInsets.all(24),
+            margin: EdgeInsets.only(
+                top: topMargin,
+                left: horizontalPadding,
+                right: horizontalPadding,
+                bottom: 32),
+            padding: EdgeInsets.all(horizontalPadding),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.7),
               borderRadius: BorderRadius.circular(20),
@@ -259,7 +321,7 @@ class _LanderClassState extends State<LanderClass> {
                       Text(
                         'Hello 👋🏻',
                         style: GoogleFonts.inter(
-                          fontSize: 18,
+                          fontSize: fontSize - 2,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF2C3E50).withOpacity(0.8),
                         ),
@@ -268,7 +330,7 @@ class _LanderClassState extends State<LanderClass> {
                       Text(
                         'Welcome to NutriDev',
                         style: GoogleFonts.inter(
-                          fontSize: 24,
+                          fontSize: headerFontSize,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF2C3E50),
                         ),
@@ -281,8 +343,8 @@ class _LanderClassState extends State<LanderClass> {
                     Get.to(() => Profile());
                   },
                   child: Container(
-                    width: 48,
-                    height: 48,
+                    width: iconSize + 20,
+                    height: iconSize + 20,
                     decoration: BoxDecoration(
                       color: const Color(0xFF2C3E50).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
@@ -294,7 +356,7 @@ class _LanderClassState extends State<LanderClass> {
                     child: Icon(
                       Icons.person_outline,
                       color: const Color(0xFF2C3E50),
-                      size: 24,
+                      size: iconSize - 4,
                     ),
                   ),
                 ),
@@ -304,12 +366,12 @@ class _LanderClassState extends State<LanderClass> {
 
           // Section Title
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Row(
               children: [
                 Container(
                   width: 4,
-                  height: 24,
+                  height: fontSize + 10,
                   decoration: BoxDecoration(
                     color: const Color(0xFF2C3E50).withOpacity(0.3),
                     borderRadius: BorderRadius.circular(2),
@@ -319,7 +381,7 @@ class _LanderClassState extends State<LanderClass> {
                 Text(
                   'Your Insights',
                   style: GoogleFonts.inter(
-                    fontSize: 20,
+                    fontSize: fontSize + 2,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF2C3E50),
                   ),
@@ -330,7 +392,7 @@ class _LanderClassState extends State<LanderClass> {
           const SizedBox(height: 20),
           // 2x2 Grid Layout
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               children: [
                 // First Row: Scan New and Add Food
@@ -339,8 +401,8 @@ class _LanderClassState extends State<LanderClass> {
                   children: [
                     // Scan New Widget
                     SizedBox(
-                      height: 160,
-                      width: 140,
+                      height: cardHeight,
+                      width: cardWidth,
                       child: Obx(() => GestureDetector(
                             onTap:
                                 isScanning.value ? null : () => scanBarcode(),
@@ -364,7 +426,7 @@ class _LanderClassState extends State<LanderClass> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: EdgeInsets.all(iconSize / 3),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF2C3E50)
                                           .withOpacity(0.1),
@@ -372,15 +434,15 @@ class _LanderClassState extends State<LanderClass> {
                                     ),
                                     child: Image.asset(
                                       'lib/asset/images/scan.png',
-                                      height: 32,
-                                      width: 32,
+                                      height: iconSize,
+                                      width: iconSize,
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  SizedBox(height: iconSize / 2),
                                   Text(
                                     'Scan New',
                                     style: GoogleFonts.inter(
-                                      fontSize: 16,
+                                      fontSize: fontSize,
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFF2C3E50),
                                     ),
@@ -392,8 +454,8 @@ class _LanderClassState extends State<LanderClass> {
                     ),
                     // Add Food Widget
                     SizedBox(
-                      height: 160,
-                      width: 140,
+                      height: cardHeight,
+                      width: cardWidth,
                       child: GestureDetector(
                         onTap: () async {
                           final result = await showDialog(
@@ -435,7 +497,7 @@ class _LanderClassState extends State<LanderClass> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: EdgeInsets.all(iconSize / 3),
                                 decoration: BoxDecoration(
                                   color:
                                       const Color(0xFF34495E).withOpacity(0.1),
@@ -443,15 +505,15 @@ class _LanderClassState extends State<LanderClass> {
                                 ),
                                 child: Icon(
                                   Icons.restaurant_outlined,
-                                  size: 32,
+                                  size: iconSize,
                                   color: const Color(0xFF34495E),
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: iconSize / 2),
                               Text(
                                 'Add Food',
                                 style: GoogleFonts.inter(
-                                  fontSize: 16,
+                                  fontSize: fontSize,
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFF2C3E50),
                                 ),
@@ -470,8 +532,8 @@ class _LanderClassState extends State<LanderClass> {
                   children: [
                     // History Widget
                     SizedBox(
-                      height: 160,
-                      width: 140,
+                      height: cardHeight,
+                      width: cardWidth,
                       child: GestureDetector(
                         onTap: () => Get.to(() => const HistoryPage()),
                         child: Container(
@@ -494,7 +556,7 @@ class _LanderClassState extends State<LanderClass> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: EdgeInsets.all(iconSize / 3),
                                 decoration: BoxDecoration(
                                   color:
                                       const Color(0xFFE74C3C).withOpacity(0.1),
@@ -502,15 +564,15 @@ class _LanderClassState extends State<LanderClass> {
                                 ),
                                 child: Image.asset(
                                   'lib/asset/images/history.png',
-                                  height: 32,
-                                  width: 32,
+                                  height: iconSize,
+                                  width: iconSize,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: iconSize / 2),
                               Text(
                                 'History',
                                 style: GoogleFonts.inter(
-                                  fontSize: 16,
+                                  fontSize: fontSize,
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFF2C3E50),
                                 ),
@@ -522,8 +584,8 @@ class _LanderClassState extends State<LanderClass> {
                     ),
                     // BMI Calculator Widget
                     SizedBox(
-                      height: 160,
-                      width: 140,
+                      height: cardHeight,
+                      width: cardWidth,
                       child: GestureDetector(
                         onTap: () => _showNutritionCalculator(),
                         child: Container(
@@ -546,7 +608,7 @@ class _LanderClassState extends State<LanderClass> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: EdgeInsets.all(iconSize / 3),
                                 decoration: BoxDecoration(
                                   color:
                                       const Color(0xFF2C3E50).withOpacity(0.1),
@@ -554,15 +616,15 @@ class _LanderClassState extends State<LanderClass> {
                                 ),
                                 child: Icon(
                                   Icons.monitor_weight_outlined,
-                                  size: 32,
+                                  size: iconSize,
                                   color: const Color(0xFF2C3E50),
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: iconSize / 2),
                               Text(
                                 'BMI Calculator',
                                 style: GoogleFonts.inter(
-                                  fontSize: 16,
+                                  fontSize: fontSize,
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFF2C3E50),
                                 ),
