@@ -39,24 +39,11 @@ class ScanHistoryService extends GetxService {
   }
 
   Future<void> addToHistory(Map<String, dynamic> productData) async {
-    // Check if product already exists in history
-    final existingIndex = scanHistory.indexWhere(
-      (item) => item['barcode'] == productData['barcode'],
-    );
-
-    if (existingIndex != -1) {
-      // Update existing entry with new scan time
-      scanHistory[existingIndex] = {
-        ...productData,
-        'scannedAt': DateTime.now().toIso8601String(),
-      };
-    } else {
-      // Add new entry
-      scanHistory.add({
-        ...productData,
-        'scannedAt': DateTime.now().toIso8601String(),
-      });
-    }
+    // Always add new entry to history, regardless of existing barcodes
+    scanHistory.add({
+      ...productData,
+      'scannedAt': DateTime.now().toIso8601String(),
+    });
 
     // Keep only last 50 items to prevent storage issues
     if (scanHistory.length > 50) {
