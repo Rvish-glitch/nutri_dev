@@ -1,5 +1,9 @@
 # NutriDev Daily Goals Tracker
 
+<div align="center">
+  <img src="assets/icons/nd1.png" alt="NutriDev Logo" width="200"/>
+</div>
+
 NutriDev Daily Goals Tracker is a cross-platform mobile application designed to help you track your daily nutrition and health goals with ease. Built with Flutter, it provides a seamless experience for monitoring your food intake, setting personalized goals, and staying motivated on your journey to better health.
 
 ## Features
