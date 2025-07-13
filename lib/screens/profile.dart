@@ -55,23 +55,6 @@ class Profile extends StatelessWidget {
                 Get.to(() => SettingsPage());
               },
             ),
-            const Divider(),
-            // Refer and Earn section
-            ListTile(
-              title:
-                  Text('Refer and Earn Program', style: GoogleFonts.lexend()),
-              onTap: () {
-                // Add navigation logic here
-              },
-            ),
-            const Divider(),
-            // Help section
-            ListTile(
-              title: Text('Help', style: GoogleFonts.lexend()),
-              onTap: () {
-                // Add navigation logic here
-              },
-            ),
           ],
         ),
       ),

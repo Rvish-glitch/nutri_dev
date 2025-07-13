@@ -11,32 +11,37 @@ class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scanHistoryService = Get.find<ScanHistoryService>();
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Scan History', style: GoogleFonts.lexend()),
-        backgroundColor: const Color(0xfff4f2f2),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_sweep),
+            icon: Icon(Icons.delete_sweep, color: theme.colorScheme.onPrimary),
             onPressed: () {
               Get.dialog(
                 AlertDialog(
-                  title: const Text('Clear History'),
-                  content: const Text(
-                      'Are you sure you want to clear all scan history?'),
+                  title: Text('Clear History',
+                      style: theme.textTheme.headlineSmall),
+                  content: Text(
+                      'Are you sure you want to clear all scan history?',
+                      style: theme.textTheme.bodyMedium),
                   actions: [
                     TextButton(
                       onPressed: () => Get.back(),
-                      child: const Text('Cancel'),
+                      child: Text('Cancel',
+                          style: TextStyle(color: theme.colorScheme.primary)),
                     ),
                     TextButton(
                       onPressed: () {
                         scanHistoryService.clearHistory();
                         Get.back();
                       },
-                      child: const Text('Clear',
-                          style: TextStyle(color: Colors.red)),
+                      child: Text('Clear',
+                          style: TextStyle(color: theme.colorScheme.tertiary)),
                     ),
                   ],
                 ),
@@ -56,14 +61,14 @@ class HistoryPage extends StatelessWidget {
                 Icon(
                   Icons.history,
                   size: 64,
-                  color: Colors.grey[400],
+                  color: theme.colorScheme.onSurface.withOpacity(0.4),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'No scan history yet',
                   style: GoogleFonts.lexend(
                     fontSize: 18,
-                    color: Colors.grey[600],
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -71,7 +76,7 @@ class HistoryPage extends StatelessWidget {
                   'Scan some products to see them here',
                   style: GoogleFonts.lexend(
                     fontSize: 14,
-                    color: Colors.grey[500],
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -90,7 +95,8 @@ class HistoryPage extends StatelessWidget {
             // Divider
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
-              child: Divider(color: Colors.grey[300]),
+              child:
+                  Divider(color: theme.colorScheme.onSurface.withOpacity(0.2)),
             ),
 
             // History List
@@ -115,13 +121,16 @@ class HistoryPage extends StatelessWidget {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          color:
-                              isManual ? Colors.green[100] : Colors.grey[200],
+                          color: isManual
+                              ? theme.colorScheme.secondary.withOpacity(0.2)
+                              : theme.colorScheme.onSurface.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           isManual ? Icons.restaurant : Icons.qr_code_scanner,
-                          color: isManual ? Colors.green : Colors.grey,
+                          color: isManual
+                              ? theme.colorScheme.secondary
+                              : theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                       title: Row(
@@ -132,6 +141,7 @@ class HistoryPage extends StatelessWidget {
                               style: GoogleFonts.lexend(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -140,14 +150,15 @@ class HistoryPage extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Colors.green[100],
+                                color: theme.colorScheme.secondary
+                                    .withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 'Manual',
                                 style: GoogleFonts.lexend(
                                   fontSize: 10,
-                                  color: Colors.green[700],
+                                  color: theme.colorScheme.secondary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -163,7 +174,8 @@ class HistoryPage extends StatelessWidget {
                               'Quantity: $quantity',
                               style: GoogleFonts.lexend(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.7),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -172,7 +184,8 @@ class HistoryPage extends StatelessWidget {
                               'Barcode: $barcode',
                               style: GoogleFonts.lexend(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.7),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -181,7 +194,8 @@ class HistoryPage extends StatelessWidget {
                             scanTime,
                             style: GoogleFonts.lexend(
                               fontSize: 12,
-                              color: Colors.grey[500],
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                         ],
@@ -212,21 +226,27 @@ class HistoryPage extends StatelessWidget {
                             value: 'view',
                             child: Row(
                               children: [
-                                Icon(Icons.visibility, size: 18),
+                                Icon(Icons.visibility,
+                                    size: 18,
+                                    color: theme.colorScheme.onSurface),
                                 SizedBox(width: 8),
-                                Text(
-                                    isManual ? 'View Details' : 'View Details'),
+                                Text(isManual ? 'View Details' : 'View Details',
+                                    style: TextStyle(
+                                        color: theme.colorScheme.onSurface)),
                               ],
                             ),
                           ),
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'remove',
                             child: Row(
                               children: [
-                                Icon(Icons.delete, size: 18, color: Colors.red),
+                                Icon(Icons.delete,
+                                    size: 18,
+                                    color: theme.colorScheme.tertiary),
                                 SizedBox(width: 8),
                                 Text('Remove',
-                                    style: TextStyle(color: Colors.red)),
+                                    style: TextStyle(
+                                        color: theme.colorScheme.tertiary)),
                               ],
                             ),
                           ),
