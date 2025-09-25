@@ -32,8 +32,9 @@ class Profile extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile', style: GoogleFonts.lexend()),
+        title: Text('Profile', style: GoogleFonts.lexend(color: Colors.black87)),
         backgroundColor: const Color(0xfff4f2f2),
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: SingleChildScrollView(
         child: Column(

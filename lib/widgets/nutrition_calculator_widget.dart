@@ -222,6 +222,11 @@ class _NutritionCalculatorWidgetState extends State<NutritionCalculatorWidget> {
                       icon: Icon(Icons.clear, color: Colors.red[600], size: 20),
                       tooltip: 'Clear saved data',
                     ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close, color: Colors.grey[600], size: 24),
+                    tooltip: 'Close',
+                  ),
                 ],
               ),
               if (_weightController.text.isNotEmpty ||

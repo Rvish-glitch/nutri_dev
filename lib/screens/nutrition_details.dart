@@ -71,10 +71,11 @@ class NutritionDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nutrition Details', style: GoogleFonts.lexend()),
+        title: Text('Nutrition Details', style: GoogleFonts.lexend(color: Colors.black87)),
         backgroundColor: const Color(0xfff4f2f2),
+        iconTheme: const IconThemeData(color: Colors.black87),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
       ),

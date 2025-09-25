@@ -48,6 +48,7 @@ class HistoryPage extends StatelessWidget {
         title: Text('Scan History', style: GoogleFonts.lexend()),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
+        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
         actions: [
           IconButton(
             icon: Icon(Icons.delete_sweep, color: theme.colorScheme.onPrimary),

@@ -45,6 +45,12 @@ class ProductDetailsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Product Details'),
         backgroundColor: const Color(0xfff4f2f2),
+        iconTheme: const IconThemeData(color: Colors.black87),
+        titleTextStyle: const TextStyle(
+          color: Colors.black87,
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+        ),
       ),
       body: GetBuilder<ProductDetailsController>(
         init: ProductDetailsController(documentId: documentId),
