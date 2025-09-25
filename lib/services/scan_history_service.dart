@@ -114,4 +114,24 @@ class ScanHistoryService extends GetxService {
       return 'Unknown';
     }
   }
+
+  // Helper: Get the 'app day' (day starts at 4am)
+  DateTime getAppDay(DateTime dt) {
+    if (dt.hour < 4) {
+      return DateTime(dt.year, dt.month, dt.day - 1);
+    } else {
+      return DateTime(dt.year, dt.month, dt.day);
+    }
+  }
+
+  // Get history for the current app day (4am-4am)
+  List<Map<String, dynamic>> getTodayHistory() {
+    final now = DateTime.now();
+    final todayAppDay = getAppDay(now);
+    return scanHistory.where((item) {
+      final scannedAt =
+          DateTime.tryParse(item['scannedAt'] ?? '') ?? DateTime(1970);
+      return getAppDay(scannedAt) == todayAppDay;
+    }).toList();
+  }
 }

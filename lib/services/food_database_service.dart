@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:csv/csv.dart';
+
 class FoodDatabaseService {
   static final Map<String, Map<String, dynamic>> _foodDatabase = {
     // Indian Foods
@@ -249,8 +254,34 @@ class FoodDatabaseService {
     },
   };
 
+  // --- Special (CSV) Foods ---
+  static Map<String, List<Map<String, dynamic>>> _specialFoodsByCategory = {};
+  static bool _specialLoaded = false;
+
+  static Future<void> loadSpecialFoods() async {
+    if (_specialLoaded) return;
+    final csvString =
+        await rootBundle.loadString('db/Indian_Food_Nutrition_Processed.csv');
+    final rows =
+        const CsvToListConverter(eol: '\n').convert(csvString, eol: '\n');
+    if (rows.isEmpty) return;
+    final header = rows[0] as List;
+    final List<List<dynamic>> dataRows = rows.sublist(1);
+    _specialFoodsByCategory.clear();
+    for (final row in dataRows) {
+      final food = Map<String, dynamic>.fromIterables(
+        header.map((e) => e.toString()),
+        row,
+      );
+      final name = (food['Dish Name'] ?? '').toString();
+      final category = _categorizeSpecialFood(name);
+      _specialFoodsByCategory.putIfAbsent(category, () => []).add(food);
+    }
+    _specialLoaded = true;
+  }
+
   static List<String> getFoodCategories() {
-    return ['Indian Foods', 'Fast Food', 'Beverages'];
+    return ['Indian Foods', 'Fast Food', 'Beverages', 'Special'];
   }
 
   static List<String> getFoodsByCategory(String category) {
@@ -291,8 +322,26 @@ class FoodDatabaseService {
     }
   }
 
+  static List<String> getSpecialSubcategories() {
+    return _specialFoodsByCategory.keys.toList();
+  }
+
+  static List<Map<String, dynamic>> getSpecialFoodsBySubcategory(
+      String subcat) {
+    return _specialFoodsByCategory[subcat] ?? [];
+  }
+
   static Map<String, dynamic>? getFoodData(String foodName) {
     return _foodDatabase[foodName];
+  }
+
+  static Map<String, dynamic>? getSpecialFoodData(String name) {
+    for (final foods in _specialFoodsByCategory.values) {
+      for (final food in foods) {
+        if (food['Dish Name'] == name) return food;
+      }
+    }
+    return null;
   }
 
   static List<String> getAllFoodNames() {
@@ -301,7 +350,16 @@ class FoodDatabaseService {
 
   static String getFoodUnit(String foodName) {
     final data = _foodDatabase[foodName];
-    return data?['per'] ?? '100g';
+    final per = data?['per']?.toString().toLowerCase() ?? '100g';
+    if (per.contains('ml') || per.contains('cup')) {
+      return 'ml';
+    } else if (per.contains('piece') ||
+        per.contains('slice') ||
+        per.contains('cup')) {
+      return per;
+    } else {
+      return 'g';
+    }
   }
 
   static Map<String, dynamic> calculateNutrition(
@@ -309,7 +367,18 @@ class FoodDatabaseService {
     final foodData = _foodDatabase[foodName];
     if (foodData == null) return {};
 
-    final multiplier = quantity / 100.0; // Assuming base data is per 100g/100ml
+    final per = foodData['per']?.toString().toLowerCase() ?? '100g';
+    double baseAmount = 100.0;
+    if (per.contains('ml')) {
+      baseAmount = 100.0;
+    } else if (per.contains('g')) {
+      baseAmount = 100.0;
+    } else if (per.contains('piece') ||
+        per.contains('slice') ||
+        per.contains('cup')) {
+      baseAmount = 1.0;
+    }
+    final multiplier = quantity / baseAmount;
 
     return {
       'calories': (foodData['calories'] * multiplier).roundToDouble(),
@@ -321,5 +390,136 @@ class FoodDatabaseService {
       'salt': (foodData['salt'] * multiplier).roundToDouble(),
       'sodium': (foodData['sodium'] * multiplier).roundToDouble(),
     };
+  }
+
+  static String _categorizeSpecialFood(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('chai') ||
+        n.contains('tea') ||
+        n.contains('coffee') ||
+        n.contains('drink') ||
+        n.contains('milkshake') ||
+        n.contains('lassi') ||
+        n.contains('juice') ||
+        n.contains('cocoa')) return 'Beverages';
+    if (n.contains('paratha') ||
+        n.contains('roti') ||
+        n.contains('naan') ||
+        n.contains('poori') ||
+        n.contains('bread')) return 'Breads & Rotis';
+    if (n.contains('rice') ||
+        n.contains('pulao') ||
+        n.contains('biryani') ||
+        n.contains('chawal')) return 'Rice & Pulao';
+    if (n.contains('dal') ||
+        n.contains('sabzi') ||
+        n.contains('curry') ||
+        n.contains('kofta') ||
+        n.contains('saag') ||
+        n.contains('bhartha') ||
+        n.contains('paneer') ||
+        n.contains('mutton') ||
+        n.contains('chicken') ||
+        n.contains('fish') ||
+        n.contains('egg') ||
+        n.contains('keema')) return 'Curries & Sabzi';
+    if (n.contains('pakora') ||
+        n.contains('samosa') ||
+        n.contains('cutlet') ||
+        n.contains('vada') ||
+        n.contains('kebab') ||
+        n.contains('spring roll') ||
+        n.contains('burger') ||
+        n.contains('toast') ||
+        n.contains('mathri') ||
+        n.contains('kachori') ||
+        n.contains('bonda')) return 'Snacks & Starters';
+    if (n.contains('kheer') ||
+        n.contains('halwa') ||
+        n.contains('ice cream') ||
+        n.contains('cake') ||
+        n.contains('pudding') ||
+        n.contains('burfi') ||
+        n.contains('lado') ||
+        n.contains('gulab jamun') ||
+        n.contains('mal pua') ||
+        n.contains('pastry') ||
+        n.contains('cookie') ||
+        n.contains('pie') ||
+        n.contains('souffle') ||
+        n.contains('mousse') ||
+        n.contains('tart') ||
+        n.contains('snowball') ||
+        n.contains('kulfi') ||
+        n.contains('custard') ||
+        n.contains('sweet') ||
+        n.contains('jam') ||
+        n.contains('chikki')) return 'Sweets & Desserts';
+    if (n.contains('salad')) return 'Salads';
+    if (n.contains('raita')) return 'Raitas';
+    if (n.contains('chutney')) return 'Chutneys';
+    return 'Others';
+  }
+
+  // Helper: Get default unit for a food name (piece, bowl, cup, etc.)
+  static String getDefaultUnit(String foodName) {
+    final n = foodName.toLowerCase();
+    // Piece-based foods
+    if (n.contains('roti') ||
+        n.contains('chapati') ||
+        n.contains('paratha') ||
+        n.contains('naan') ||
+        n.contains('poori') ||
+        n.contains('idli') ||
+        n.contains('dosa') ||
+        n.contains('samosa') ||
+        n.contains('pakora') ||
+        n.contains('cutlet') ||
+        n.contains('vada') ||
+        n.contains('kebab') ||
+        n.contains('spring roll') ||
+        n.contains('burger') ||
+        n.contains('toast') ||
+        n.contains('mathri') ||
+        n.contains('kachori') ||
+        n.contains('bonda') ||
+        n.contains('pizza') ||
+        n.contains('sandwich') ||
+        n.contains('cake') ||
+        n.contains('cookie') ||
+        n.contains('lado') ||
+        n.contains('gulab jamun')) {
+      return 'piece';
+    }
+    // Bowl-based foods
+    if (n.contains('dal') ||
+        n.contains('sabzi') ||
+        n.contains('curry') ||
+        n.contains('kofta') ||
+        n.contains('saag') ||
+        n.contains('bhartha') ||
+        n.contains('paneer') ||
+        n.contains('mutton') ||
+        n.contains('chicken') ||
+        n.contains('fish') ||
+        n.contains('egg') ||
+        n.contains('keema') ||
+        n.contains('rice') ||
+        n.contains('pulao') ||
+        n.contains('biryani') ||
+        n.contains('chawal')) {
+      return 'bowl';
+    }
+    // Cup-based foods
+    if (n.contains('tea') ||
+        n.contains('chai') ||
+        n.contains('coffee') ||
+        n.contains('milk') ||
+        n.contains('lassi') ||
+        n.contains('juice')) {
+      return 'cup';
+    }
+    // Default fallback
+    return 'g';
   }
 }

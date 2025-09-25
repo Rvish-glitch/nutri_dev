@@ -8,8 +8,9 @@ class NutritionSummaryService {
   Future<Map<String, dynamic>> getNutritionSummary() async {
     // Get the scan history service instance from GetX
     final scanHistoryService = Get.find<ScanHistoryService>();
-    final history = scanHistoryService.getHistory();
-    print('DEBUG: Processing ${history.length} products for nutrition summary');
+    final history = scanHistoryService.getTodayHistory();
+    print(
+        'DEBUG: Processing  [32m${history.length} [0m products for nutrition summary');
     print('DEBUG: History items: $history');
 
     final summary = <String, dynamic>{

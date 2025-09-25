@@ -21,6 +21,7 @@ dependencies:
   shared_preferences: ^2.2.2
   firebase_core: ^2.27.0
   responsive_framework: ^1.4.0
+  csv: ^5.0.2
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -42,3 +43,4 @@ flutter:
     - lib/asset/images/avoid.png
     - assets/icons/nd1.png
     - assets/icons/ndw.png
+    - db/Indian_Food_Nutrition_Processed.csv
